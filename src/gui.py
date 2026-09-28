@@ -1,4 +1,4 @@
-"""GUI-эмулятор оболочки ОС (этап 1)."""
+"""GUI-эмулятор оболочки ОС."""
 from __future__ import annotations
 
 import tkinter as tk
@@ -10,16 +10,23 @@ from src.environment import build_title, get_hostname, get_username
 from src.parser import parse
 
 EXIT_MARKER = "__EXIT__"
+DEFAULT_PROMPT = "{username}@{hostname}$ "
 
 
 class EmulatorGui:
     """Графический интерфейс эмулятора."""
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        prompt_template: str | None = None,
+        script_path: str | None = None,
+    ) -> None:
         self.ctx = CommandContext(
             username=get_username(),
             hostname=get_hostname(),
         )
+        self.prompt_template = prompt_template or DEFAULT_PROMPT
+        self.script_path = script_path
 
         self.root = tk.Tk()
         self.root.title(build_title())
@@ -41,6 +48,8 @@ class EmulatorGui:
         self._print_welcome()
         self._show_prompt()
 
+    # ---------------------------------------------------------------- вывод
+
     def _print(self, text: str) -> None:
         """Печатает текст в область вывода."""
         self.output.configure(state="normal")
@@ -55,10 +64,20 @@ class EmulatorGui:
         self._print("-" * 60)
 
     def _prompt(self) -> str:
-        return f"{self.ctx.username}@{self.ctx.hostname}$ "
+        """Формирует строку приглашения на основе шаблона."""
+        try:
+            return self.prompt_template.format(
+                username=self.ctx.username,
+                hostname=self.ctx.hostname,
+            )
+        except (KeyError, IndexError):
+            # Если в шаблоне неизвестный плейсхолдер — возвращаем как есть
+            return self.prompt_template
 
     def _show_prompt(self) -> None:
         self._print(self._prompt())
+
+    # -------------------------------------------------------------- команды
 
     def _on_enter(self, _event: tk.Event) -> None:
         line = self.entry.get()
@@ -95,13 +114,7 @@ class EmulatorGui:
 
         self._show_prompt()
 
+    # ---------------------------------------------------------------- запуск
+
     def run(self) -> None:
         self.root.mainloop()
-
-
-def main() -> None:
-    EmulatorGui().run()
-
-
-if __name__ == "__main__":
-    main()

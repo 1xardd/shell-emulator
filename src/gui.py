@@ -20,10 +20,12 @@ class EmulatorGui:
         self,
         prompt_template: str | None = None,
         script_path: str | None = None,
+        vfs=None,
     ) -> None:
         self.ctx = CommandContext(
             username=get_username(),
             hostname=get_hostname(),
+            vfs=vfs,
         )
         self.prompt_template = prompt_template or DEFAULT_PROMPT
         self.script_path = script_path

@@ -5,11 +5,13 @@ from src.commands.base import Command, CommandContext
 from src.commands.cd import CdCommand
 from src.commands.exit import ExitCommand
 from src.commands.ls import LsCommand
+from src.commands.vfs_info import VfsInfoCommand
 
 COMMANDS: dict[str, Command] = {
     "ls": LsCommand(),
     "cd": CdCommand(),
     "exit": ExitCommand(),
+    "vfs-info": VfsInfoCommand(),
 }
 
 

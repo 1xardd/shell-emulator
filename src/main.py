@@ -55,32 +55,42 @@ def main() -> int:
     if args.debug:
         print_debug_info(args)
 
-    # Проверяем существование файлов, если пути заданы
-    if args.vfs is not None and not args.vfs.exists():
-        print(f"Ошибка: VFS не найдена: {args.vfs}", file=sys.stderr)
-        return 1
-    if args.script is not None and not args.script.exists():
-        print(f"Ошибка: скрипт не найден: {args.script}", file=sys.stderr)
-        return 1
-
     from src.commands.base import CommandContext
     from src.environment import get_hostname, get_username
-    from src.script_runner import run_script
+    from src.vfs import VirtualFileSystem, VfsError
+
+    # Загружаем VFS, если задан путь
+    vfs = None
+    if args.vfs is not None:
+        try:
+            vfs = VirtualFileSystem.from_xml(args.vfs)
+            if args.debug:
+                print(f"[DEBUG] VFS загружена: {vfs.name}")
+                print(f"[DEBUG] SHA-256: {vfs.hash_sha256}")
+        except VfsError as exc:
+            print(f"Ошибка загрузки VFS: {exc}", file=sys.stderr)
+            return 1
 
     ctx = CommandContext(
         username=get_username(),
         hostname=get_hostname(),
+        vfs=vfs,
     )
 
     # Если задан стартовый скрипт — выполняем его.
     if args.script is not None:
+        if not args.script.exists():
+            print(f"Ошибка: скрипт не найден: {args.script}", file=sys.stderr)
+            return 1
+
+        from src.script_runner import run_script
+
         result = run_script(args.script, ctx)
 
         if result.error is not None:
             print(f"Ошибка скрипта: {result.error}", file=sys.stderr)
             return 1
 
-        # Печатаем диалог: команда и результат.
         for line in result.lines:
             print(f"{ctx.username}@{ctx.hostname}$ {line.source}")
             if line.error is not None:
@@ -88,16 +98,16 @@ def main() -> int:
             elif line.output:
                 print(line.output)
 
-        # Если был exit — завершаем работу.
         if result.exit_requested:
             return 0
 
     # Запуск GUI
     from src.gui import EmulatorGui
 
-    gui = EmulatorGui(prompt_template=args.prompt)
+    gui = EmulatorGui(prompt_template=args.prompt, vfs=vfs)
     gui.run()
     return 0
+
 
 if __name__ == "__main__":
     raise SystemExit(main())

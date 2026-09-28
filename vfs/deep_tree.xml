@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dir name="/">
+  <file name="motd.txt">V2VsY29tZSB0byB0aGUgZW11bGF0b3Ih</file>
+  <dir name="home">
+    <dir name="user">
+      <file name="info.txt">VXNlciBob21lIGRpcmVjdG9yeS4=</file>
+      <dir name="projects">
+        <file name="project1.txt">UHJvamVjdCAxIGRhdGEu</file>
+        <file name="project2.txt">UHJvamVjdCAyIGRhdGEu</file>
+        <dir name="archive">
+          <file name="old.txt">T2xkIGFyY2hpdmVkIGRhdGEu</file>
+        </dir>
+      </dir>
+      <dir name="docs">
+        <file name="notes.txt">RG9jdW1lbnRhdGlvbiBub3Rlcy4=</file>
+      </dir>
+    </dir>
+  </dir>
+  <dir name="etc">
+    <file name="config.cfg">Y29uZmlnPXRydWU=</file>
+  </dir>
+</dir>

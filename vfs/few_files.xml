@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dir name="/">
+  <file name="readme.txt">VGhpcyBpcyBhIHJlYWRtZSBmaWxlLg==</file>
+  <file name="notes.txt">Tm90ZXMgZm9yIHRoZSBwcm9qZWN0Lg==</file>
+  <file name="data.bin">AAECAwQFBgc=</file>
+  <dir name="docs">
+    <file name="guide.txt">R3VpZGUgdG8gdGhlIGVtdWxhdG9yLg==</file>
+  </dir>
+</dir>

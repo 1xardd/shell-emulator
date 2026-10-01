@@ -33,6 +33,7 @@ def run_script(
     """Выполняет стартовый скрипт построчно.
 
     Ошибочные строки пропускаются, но фиксируются в результате.
+    Каждая команда добавляется в историю контекста.
     """
     result = ScriptResult()
 
@@ -52,6 +53,7 @@ def run_script(
         if not source or source.startswith("#"):
             continue
 
+        ctx.history.append(source)
         line = ScriptLine(source=source)
 
         try:

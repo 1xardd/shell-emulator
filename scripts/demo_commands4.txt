@@ -1,0 +1,25 @@
+# Тестовый скрипт для этапа 4: whoami, history, uptime.
+
+# Проверка whoami
+whoami
+
+# Проверка uptime
+uptime
+
+# Промежуточные команды, чтобы история наполнилась
+ls
+vfs-info
+
+# Проверка history — должна показать всё, что было выше
+history
+
+# Проверка обработки ошибок
+ls /nonexistent
+cd missing
+abracadabra
+
+# Смотрим, попали ли ошибочные команды в историю
+history
+
+# Финальный whoami
+whoami

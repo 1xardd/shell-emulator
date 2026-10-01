@@ -6,6 +6,7 @@ from src.commands.cd import CdCommand
 from src.commands.exit import ExitCommand
 from src.commands.history import HistoryCommand
 from src.commands.ls import LsCommand
+from src.commands.rm import RmCommand
 from src.commands.uptime import UptimeCommand
 from src.commands.vfs_info import VfsInfoCommand
 from src.commands.whoami import WhoamiCommand
@@ -18,6 +19,7 @@ COMMANDS: dict[str, Command] = {
     "whoami": WhoamiCommand(),
     "history": HistoryCommand(),
     "uptime": UptimeCommand(),
+    "rm": RmCommand(),
 }
 
 

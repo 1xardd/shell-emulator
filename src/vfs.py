@@ -48,14 +48,7 @@ class VirtualFileSystem:
 
     @classmethod
     def from_xml(cls, path: Path) -> "VirtualFileSystem":
-        """Загружает VFS из XML-файла.
-
-        Args:
-            path: путь к XML-файлу.
-
-        Raises:
-            VfsError: файл не найден, неверный формат, ошибка парсинга.
-        """
+        """Загружает VFS из XML-файла."""
         if not path.exists():
             raise VfsError(f"Файл VFS не найден: {path}")
 
@@ -107,14 +100,7 @@ class VirtualFileSystem:
     # ---------------------------------------------------- навигация
 
     def resolve(self, cwd: list[str], target: str = ".") -> VfsNode:
-        """Возвращает узел по пути target относительно cwd.
-
-        Поддерживает:
-        - "." — текущая директория
-        - ".." — родительская
-        - "a/b/c" — вложенный путь
-        - "/a/b" — абсолютный путь от корня
-        """
+        """Возвращает узел по пути target относительно cwd."""
         if target == "":
             target = "."
         if target == ".":
@@ -122,15 +108,11 @@ class VirtualFileSystem:
         if target.startswith("/"):
             return self._resolve_absolute(target)
 
-        # Относительный путь от cwd
         node = self._resolve_cwd(cwd)
         for part in target.split("/"):
             if part in ("", "."):
                 continue
             if part == "..":
-                # Родителя в дереве без ссылок не найти — упрощаем:
-                # идём от корня заново без последнего элемента cwd.
-                # Для простоты ".." обрабатывается на уровне cd.
                 continue
             if part not in node.children:
                 raise VfsError(f"Нет такого файла или каталога: {target}")
@@ -156,3 +138,47 @@ class VirtualFileSystem:
                 raise VfsError(f"Нет такого файла или каталога: {target}")
             node = node.children[part]
         return node
+
+    # ---------------------------------------------------- модификация
+
+    def remove(self, cwd: list[str], target: str) -> None:
+        """Удаляет файл или пустую директорию из VFS.
+
+        Изменения только в памяти — исходный XML не трогается.
+
+        Raises:
+            VfsError: если путь не найден, это корень,
+                      директория не пуста.
+        """
+        if not target or target in (".", "/", ".."):
+            raise VfsError("Нельзя удалить корень или текущую директорию")
+
+        if target.startswith("/"):
+            parent_parts: list[str] = []
+            parts = [p for p in target.split("/") if p]
+        else:
+            parent_parts = list(cwd)
+            parts = [p for p in target.split("/") if p]
+
+        if not parts:
+            raise VfsError("Не указан путь для удаления")
+
+        name = parts[-1]
+        parent_parts_for_node = list(parent_parts)
+        for part in parts[:-1]:
+            parent_parts_for_node.append(part)
+
+        try:
+            parent = self._resolve_cwd(parent_parts_for_node)
+        except VfsError as exc:
+            raise VfsError(f"Родительская директория не найдена: {target}") from exc
+
+        if name not in parent.children:
+            raise VfsError(f"Нет такого файла или каталога: {target}")
+
+        node = parent.children[name]
+
+        if node.is_dir and node.children:
+            raise VfsError(f"Директория не пуста: {target}")
+
+        del parent.children[name]
